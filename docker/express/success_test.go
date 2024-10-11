@@ -4,20 +4,25 @@ import (
 	"testing"
 
 	"github.com/gruntwork-io/terratest/modules/docker"
-	"github.com/stretchr/testify/assert"
 )
 
 func TestSuccessExample(t *testing.T) {
-	tag := "unchaptered/docker-express"
+	tag := "sample"
 	buildOptions := &docker.BuildOptions{
 		Tags: []string{tag},
 	}
-
 	docker.Build(t, "./", buildOptions)
 
-	runOptions := &docker.RunOptions{
+	// docker run --detach -P sample
+	runOpts := &docker.RunOptions{
 		Detach: true,
+		OtherOptions: []string{"-P"},
 	}
-	output := docker.Run(t, tag, runOptions)
-	assert.Equal(t, output, "hh")
+	containerID := docker.Run(t, tag, runOpts)
+	
+	// docker stop $containerID
+	stopOpts := &docker.StopOptions{}
+	defer docker.Stop(t, []string{containerID}, stopOpts)
+
+
 }   
